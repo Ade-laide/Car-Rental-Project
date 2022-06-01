@@ -1,0 +1,228 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+@model  IEnumerable<Car_Rental_Project.Models.RentailViewModel>
+<div class="row">
+
+    <div class="col-sm-4">
+        @using (Html.BeginForm("Save", "rent", FormMethod.Post, new { id = "popupform" }))
+        {
+
+
+            <div>
+                <h1>Car Rentail</h1>
+            </div>
+
+
+            <div class="form-group">
+                <label class="form-label">Car no</label>
+                <select class="form-control " id="CarId" name="CarId" placeholder="CarNo" required>
+                    <option>Please Select</option>
+                </select>
+            </div>
+
+
+
+            <div class="form-group">
+                <label class="form-label">Customer ID</label>
+                <input type="text" id="CustId" name="CustId" class="form-control" placeholder="CustID" required>
+            </div>
+
+
+
+
+            <div class="form-group">
+                <label class="form-label">Customer Name</label>
+                <input type="text" id="Custname" name="CustName" class="form-control" placeholder="CustName" required>
+            </div>
+
+
+
+
+
+            <div class="form-group">
+                <label class="form-label">Rentail Fee</label>
+                <input type="text" id="Fee" name="Fee" class="form-control" placeholder="Rentail fee" required>
+            </div>
+
+
+
+            <div class="form-group">
+                <label class="form-label">Start Date</label>
+                <input type="date" id="sDate" name="sDate" class="form-control" placeholder="Rentail fee" required>
+            </div>
+
+
+            <div class="form-group">
+                <label class="form-label">End Date</label>
+                <input type="date" id="eDate" name="eDate" class="form-control" placeholder="Rentail fee" required>
+            </div>
+
+
+
+
+
+
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-success" />
+            </div>
+
+        }
+        </div>
+
+        <div class="col-sm-8">
+            <table class="table">
+
+                <tr>
+                    <th>CarNo</th>
+                    <th>Customer ID</th>
+                    <th>Fee</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Available</th>
+
+                   </tr>
+           @foreach(var item in Model)
+            {
+
+            <tr>
+                <td>@item.CarId</td>
+                <td>@item.CustId</td>
+                <td>@item.Fee</td>
+                <td>@item.sDate</td>
+                <td>@item.eDate</td>
+                <td>@item.Available</td>
+
+
+                </tr>
+
+           }
+
+
+        </table>
+
+        </div>
+        </div>
+
+        @section scripts
+{
+            <script src="~/Scripts/jquery-3.6.0.js"></script>
+            <script src="~/Scripts/jquery-3.6.0.min.js"></script>
+            <script src="~/Scripts/jquery.validate.js"></script>
+
+            <script>
+                getCar();
+
+                load();
+                function load() {
+                    $("#custid").attr("disabled", "disabled");
+                    $("#custname").attr("disabled", "disabled");
+                    $("#Fee").attr("disabled", "disabled");
+                    $("#sDate").attr("disabled", "disabled");
+                    $("#eDate").attr("disabled", "disabled");
+
+
+
+                }
+
+                function getCar() {
+                    $.ajax({
+                        type: 'GET',
+                        url: '/rent/GetCar',
+                        dataType: 'JSON',
+                        success: function (data) {
+
+                            console.log(data);
+
+                            for (var i = 0; i < data.length; i++) {
+                                $("#CarId").append($("<option/>", {
+                                    text: data[i].CarNo
+                                }));
+
+                            }
+
+                        }
+
+
+                    });
+
+                }
+
+                $("#CarId").change(function () {
+
+                    available();
+                });
+
+                function available() {
+
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/rent/Getavil?CarNo=' + $("#CarId").val(),
+                        dataType: 'JSON',
+                        success: function (data) {
+
+                            console.log(data)
+                            var aval = data;
+
+
+                            if (aval == "yes") {
+
+                                $("#custid").removeAttr("disabled");
+                                $("#custname").removeAttr("disabled");
+                                $("#Fee").removeAttr("disabled");
+                                $("#sDate").removeAttr("disabled");
+                                $("#eDate").removeAttr("disabled");
+                            }
+                            else {
+
+                                $("#custid").attr("disabled", "disabled");
+                                $("#custname").attr("disabled", "disabled");
+                                $("#Fee").attr("disabled", "disabled");
+                                $("#sDate").attr("disabled", "disabled");
+                                $("#eDate").attr("disabled", "disabled");
+
+
+                            }
+
+                        }
+
+
+                    });
+
+
+
+                }
+
+                getCustomer();
+                function getCustomer() {
+
+                    $("#CustId").keyup(function (e) {
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '/Rent/Getid?id=' + $("#CustId").val(),
+                            dataType: 'JSON',
+                            success: function (data) {
+
+                                console.log(data)
+
+                                $("#Custname").val(data)
+
+
+
+                            }
+
+
+                        });
+
+
+                    });
+
+                }
+
+
+            </script>
+
+        }
